@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protokol o uvedení do prevádzky - Mitsubishi | SPEKTRA INSTALL</title>
+    
+    <style>
+        :root { --brand-red: #E60012; --border-color: #bbbbbb; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.2; color: #333; margin: 0; padding: 5px; background-color: #f0f2f5; }
+        .paper { background: white; width: 210mm; min-height: 297mm; padding: 10mm 15mm; margin: 5px auto; box-shadow: 0 5px 25px rgba(0,0,0,0.1); position: relative; box-sizing: border-box; }
+        
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--brand-red); padding-bottom: 8px; margin-bottom: 12px; }
+        .logo-box { display: flex; align-items: center; }
+        .logo-box img { height: 45px; }
+        
+        h1 { font-size: 15px; margin: 0; color: var(--brand-red); text-transform: uppercase; text-align: right; }
+        h2 { font-size: 11px; background: #e0e0e0; border-left: 4px solid var(--brand-red); color: #333; padding: 5px 10px; margin: 15px 0 6px 0; text-transform: uppercase; font-weight: bold; }
+        
+        table { width: 100%; border-collapse: collapse; margin-bottom: 8px; font-size: 11px; }
+        th, td { border: 1px solid var(--border-color); padding: 5px 8px; text-align: left; vertical-align: middle; }
+        th { background-color: #f8f8f8; width: 25%; font-weight: bold; color: #444; }
+        
+        input[type="text"], select, textarea { width: 100%; border: none; border-bottom: 1px dashed #ccc; font-family: inherit; font-size: inherit; background: transparent; padding: 2px 0; }
+        input[type="text"]:focus, select:focus, textarea:focus { outline: none; border-bottom: 1px solid var(--brand-red); }
+        
+        /* Foto sekcia */
+        .photo-grid { display: flex; gap: 10px; margin-bottom: 10px; }
+        .photo-container { flex: 1; border: 1px dashed #ccc; height: 120px; display: flex; align-items: center; justify-content: center; background: #fafafa; border-radius: 4px; overflow: hidden; position: relative; }
+        .photo-preview { max-width: 100%; max-height: 100%; display: none; }
+        .photo-placeholder { color: #888; font-size: 11px; text-align: center; }
+        
+        /* Checkboxy */
+        .checkbox-section { font-size: 11px; line-height: 1.8; margin-top: 5px; }
+        .check-item { display: flex; gap: 8px; align-items: flex-start; }
+
+        .controls { position: fixed; bottom: 25px; right: 25px; display: flex; flex-direction: column; gap: 8px; z-index: 1000; }
+        .btn { padding: 8px 16px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; color: white; background: var(--brand-red); display: flex; align-items: center; justify-content: center; font-size: 11px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .btn-new { background: #555; }
+        .btn-photo { background: #444; }
+
+        #globalLoader { position: fixed; inset:0; background: rgba(255,255,255,0.7); display: none; align-items: center; justify-content: center; z-index: 3000; font-weight: bold; color: var(--brand-red); }
+        #messageBox { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 10px 20px; border-radius: 5px; color: white; display: none; z-index: 4000; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+
+        @media print {
+            .controls, #globalLoader, #messageBox { display: none !important; }
+            .paper { box-shadow: none; margin: 0; width: 100%; padding: 5mm 10mm; }
+            input, select, textarea { border-bottom: none !important; -webkit-appearance: none; }
+            input::placeholder { color: transparent; }
+            h2 { -webkit-print-color-adjust: exact; background-color: #e0e0e0 !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="globalLoader">Ukladám údaje...</div>
+<div id="messageBox"></div>
+
+<div class="controls">
+    <button class="btn btn-new" id="btnNewProtocol">+ Nový protokol</button>
+    <button class="btn" id="btnSaveToArchive">Uložiť do archívu</button>
+    <button class="btn" onclick="window.print()">Tlačiť PDF</button>
+    <label class="btn btn-photo">Foto 1<input type="file" id="filePhoto1" accept="image/*" style="display: none;"></label>
+    <label class="btn btn-photo">Foto 2<input type="file" id="filePhoto2" accept="image/*" style="display: none;"></label>
+</div>
+
+<div class="paper">
+    <header>
+        <div class="logo-box">
+            <img src="Mitsubishi_Electric-Logo.wine.png" alt="Mitsubishi Electric" onerror="this.outerHTML='<span style=\'color: #E60012; font-size: 24px; font-weight: 900;\'>MITSUBISHI ELECTRIC</span>'">
+        </div>
+        <div>
+            <h1>PROTOKOL O UVEDENÍ DO PREVÁDZKY</h1>
+            <div style="font-size: 10px; margin-top: 5px; text-align: right;">Číslo protokolu: <input type="text" id="protoCislo" style="width: 100px; font-weight: bold; text-align: right;" readonly></div>
+        </div>
+    </header>
+
+    <h2>1. ZMLUVNÉ STRANY</h2>
+    <table>
+        <tr>
+            <th>Objednávateľ (Zákazník)</th>
+            <td>Meno: <input type="text" id="zakaznikMeno"><br>Adresa montáže: <input type="text" id="zakaznikAdresa"></td>
+        </tr>
+        <tr>
+            <th style="vertical-align: top;">Dodávateľ (Servis)</th>
+            <td>
+                <strong>SPEKTRA INSTALL s.r.o.</strong><br>
+                Hollého 210, 015 01 Rajec<br>
+                Zodpovedný technik: <strong>Pavol Pastorek</strong>
+            </td>
+        </tr>
+    </table>
+
+    <h2>2. IDENTIFIKÁCIA ZARIADENIA</h2>
+    <table>
+        <tr>
+            <th>Typ zostavy (Rýchly výber)</th>
+            <td colspan="3">
+                <select id="modelSelector" style="font-weight: bold; color: var(--brand-red);">
+                    <option value="z80">Zubadan 8kW: PUZ-SHWM80VAA + ERSF-YM9E</option>
+                    <option value="z100" selected>Zubadan 10kW: PUZ-SHWM100YAA + ERSF-YM9E</option>
+                    <option value="z120">Zubadan 12kW: PUZ-SHWM120YAA + ERST-YM9E</option>
+                    <option value="pi80">Power Inverter 8kW: PUZ-SWM80VAA + ERSF-VM2E</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th>Vonkajšia jednotka</th>
+            <td><input type="text" id="extModel" value="PUZ-SHWM100YAA"></td>
+            <th>Sériové č. (S/N)</th>
+            <td><input type="text" id="extSerial"></td>
+        </tr>
+        <tr>
+            <th>Vnútorná j. / Hydrobox</th>
+            <td><input type="text" id="intModel" value="ERSF-YM9E"></td>
+            <th>Sériové č. (S/N)</th>
+            <td><input type="text" id="intSerial"></td>
+        </tr>
+        <tr>
+            <th>Zásobník TÚV / Iné</th>
+            <td><input type="text" id="tankModel" placeholder="Typ zásobníka"></td>
+            <th>Objem (l)</th>
+            <td><input type="text" id="tankVol" placeholder="Litrov"></td>
+        </tr>
+    </table>
+
+    <h2>3. HYDRAULIKA A KVALITA VODY (VDI 2035)</h2>
+    <table>
+        <tr>
+            <th>Tvrdosť vstupnej vody (°dH)</th>
+            <td><input type="text" value="8.0"></td>
+            <th>pH vody v systéme</th>
+            <td><input type="text" value="8.0"></td>
+        </tr>
+        <tr>
+            <th>Tlak vo vykurovaní (bar)</th>
+            <td><input type="text" value="1.5"></td>
+            <th>Tlak expanznej nádoby (bar)</th>
+            <td><input type="text" value="1.2"></td>
+        </tr>
+        <tr>
+            <th>Prietok (l/min)</th>
+            <td><input type="text"></td>
+            <th>Magnetický filter</th>
+            <td><input type="text" value="Áno (Vyčistený)"></td>
+        </tr>
+    </table>
+
+    <h2>4. CHLADIVOVÝ OKRUH A ELEKTRO</h2>
+    <table>
+        <tr>
+            <th>Typ chladiva</th>
+            <td><input type="text" value="R32" readonly></td>
+            <th>Množstvo chladiva (kg)</th>
+            <td><input type="text"></td>
+        </tr>
+        <tr>
+            <th>Elektrické istenie (A)</th>
+            <td><input type="text"></td>
+            <th>Prierez prívodného kábla</th>
+            <td><input type="text" placeholder="napr. 5x2.5 mm²"></td>
+        </tr>
+    </table>
+
+    <h2>5. PARAMETRE A NASTAVENIA</h2>
+    <table>
+        <tr>
+            <th>Vykurovacia krivka</th>
+            <td><input type="text" value="0.5"></td>
+            <th>Bivalentný bod (°C)</th>
+            <td><input type="text" value="-7"></td>
+        </tr>
+        <tr>
+            <th>Nastavená teplota TÚV (°C)</th>
+            <td><input type="text" value="50"></td>
+            <th>Max. výkon ohrevu - záloha (kW)</th>
+            <td><input type="text" value="3 / 6 / 9"></td>
+        </tr>
+        <tr>
+            <th>Max. teplota výstupu (°C)</th>
+            <td><input type="text" value="45"></td>
+            <th>Prevádzkový režim</th>
+            <td><input type="text" value="Auto (Kúrenie / TÚV)"></td>
+        </tr>
+    </table>
+
+    <h2>6. POZNÁMKY TECHNIKA</h2>
+    <textarea id="notes" style="width: 100%; min-height: 40px;"></textarea>
+
+    <h2>7. FOTODOKUMENTÁCIA</h2>
+    <div class="photo-grid">
+        <div class="photo-container">
+            <span id="photoPlaceholder1" class="photo-placeholder">[ Vložte fotografiu 1 ]</span>
+            <img id="photoPreview1" class="photo-preview">
+        </div>
+        <div class="photo-container">
+            <span id="photoPlaceholder2" class="photo-placeholder">[ Vložte fotografiu 2 ]</span>
+            <img id="photoPreview2" class="photo-preview">
+        </div>
+    </div>
+
+    <h2>8. KONTROLNÝ ZOZNAM A ODOVZDANIE</h2>
+    <div class="checkbox-section">
+        <label class="check-item"><input type="checkbox" checked> Komunikácia CAN (vonkajšia/vnútorná jednotka) je plne funkčná.</label>
+        <label class="check-item"><input type="checkbox" checked> Systém bol odvzdušnený a pracuje bez aktívnych chybových hlásení.</label>
+        <label class="check-item"><input type="checkbox" checked> Vykonaná vizuálna kontrola a kontrola tesnosti hydraulických/chladivových spojov.</label>
+        <label class="check-item"><input type="checkbox" checked> Zákazník bol zaškolený do obsluhy ovládača (termostatu).</label>
+        <label class="check-item"><input type="checkbox" checked> Návody na obsluhu a záručné podmienky boli odovzdané užívateľovi.</label>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; margin-top: 20px; font-size: 10px;">
+        <div style="width: 45%; text-align: center; border-top: 1px solid #333; padding-top: 5px; margin-top: 60px;">
+            Podpis a pečiatka technika (VSP)
+        </div>
+        <div style="width: 45%; text-align: center; margin-top: -20px;">
+            <canvas id="sigPad" style="border:1px solid #ccc; width:100%; height:70px; background: #fafafa;"></canvas>
+            <div style="border-top: 1px solid #333; padding-top: 5px; margin-top: 5px;">Podpis zákazníka / užívateľa</div>
+            <button id="btnClearSig" style="font-size: 9px; padding: 2px 5px; margin-top: 2px; cursor:pointer;">Vymazať podpis</button>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px; font-size: 9px; color: #777; border-top: 1px dashed #ccc; padding-top: 8px;">
+        Dátum uvedenia do prevádzky: <input type="text" id="datumInput" style="width: 80px; font-weight: bold; border:none; background:none;"> | 
+        SPEKTRA INSTALL s.r.o. | Protokol verzia 2.1
+    </div>
+</div>
+
+<script type="module">
+    // 1. IMPORT FIREBASE MODULOV
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getFirestore, collection, doc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+    // 2. FIREBASE KONFIGURÁCIA
+    const firebaseConfig = {
+        apiKey: "AIzaSyCwcQRH3805_Fif-a451ER-0VxFsZh2l8s",
+        authDomain: "vspspektra.firebaseapp.com",
+        databaseURL: "https://vspspektra-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "vspspektra",
+        storageBucket: "vspspektra.firebasestorage.app",
+        messagingSenderId: "711979749068",
+        appId: "1:711979749068:web:8ce68d29d2059456f43c69",
+        measurementId: "G-J0NXFGGJSM"
+    };
+
+    // 3. INICIALIZÁCIA APLIKÁCIE
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const appId = 'vspspektra-app';
+
+    // 4. POMOCNÉ FUNKCIE (Teraz nie sú na objekte window, ale vo vnútri modulu)
+    function showMessage(text, type = 'info') {
+        const box = document.getElementById('messageBox');
+        box.textContent = text;
+        box.style.backgroundColor = type === 'error' ? '#d32f2f' : '#E60012';
+        box.style.display = 'block';
+        setTimeout(() => { box.style.display = 'none'; }, 5000);
+    }
+
+    async function generateNextNumber() {
+        const today = new Date();
+        const datePrefix = today.getFullYear() + String(today.getMonth() + 1).padStart(2, '0') + String(today.getDate()).padStart(2, '0');
+        let nextSequence = 1;
+        try {
+            const querySnapshot = await getDocs(collection(db, 'artifacts', appId, 'public', 'data', 'protocols'));
+            const sequences = [];
+            querySnapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.protoCislo && data.protoCislo.startsWith(datePrefix)) {
+                    const parts = data.protoCislo.split('-');
+                    if (parts.length > 1) sequences.push(parseInt(parts[1]));
+                }
+            });
+            if (sequences.length > 0) nextSequence = Math.max(...sequences) + 1;
+        } catch (e) { console.error("Chyba pri čísle:", e); }
+        document.getElementById('protoCislo').value = `${datePrefix}-${String(nextSequence).padStart(2, '0')}`;
+    }
+
+    async function createNewProtocol() {
+        if (!confirm("Vytvoriť nový protokol? Neuložené zmeny sa stratia.")) return;
+        document.querySelectorAll('input[type="text"], textarea').forEach(i => { if(i.id !== 'datumInput' && i.id !== 'extModel' && i.id !== 'intModel') i.value = ''; });
+        
+        // Clear photos
+        document.getElementById('photoPreview1').style.display = 'none';
+        document.getElementById('photoPreview1').src = '';
+        document.getElementById('photoPlaceholder1').style.display = 'block';
+        
+        document.getElementById('photoPreview2').style.display = 'none';
+        document.getElementById('photoPreview2').src = '';
+        document.getElementById('photoPlaceholder2').style.display = 'block';
+
+        clearSig();
+        
+        const today = new Date();
+        document.getElementById('datumInput').value = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
+        await generateNextNumber();
+        showMessage("Nový protokol pripravený.");
+    }
+
+    async function saveToArchive() {
+        const loader = document.getElementById('globalLoader');
+        loader.style.display = 'flex';
+        try {
+            const docId = `${document.getElementById('protoCislo').value}_${document.getElementById('zakaznikMeno').value.replace(/\s/g, '_')}`;
+            if (!document.getElementById('zakaznikMeno').value) throw new Error("Chýba meno zákazníka!");
+
+            const data = {
+                protoCislo: document.getElementById('protoCislo').value,
+                zakaznikMeno: document.getElementById('zakaznikMeno').value,
+                zakaznikAdresa: document.getElementById('zakaznikAdresa').value,
+                extModel: document.getElementById('extModel').value,
+                extSerial: document.getElementById('extSerial').value,
+                intModel: document.getElementById('intModel').value,
+                intSerial: document.getElementById('intSerial').value,
+                datum: document.getElementById('datumInput').value,
+                signature: document.getElementById('sigPad').toDataURL(),
+                photo1: document.getElementById('photoPreview1').src.startsWith('data:') ? document.getElementById('photoPreview1').src : null,
+                photo2: document.getElementById('photoPreview2').src.startsWith('data:') ? document.getElementById('photoPreview2').src : null,
+                notes: document.getElementById('notes').value,
+                createdAt: new Date().toISOString()
+            };
+            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'protocols', docId), data);
+            showMessage("Protokol úspešne uložený!");
+        } catch (e) { showMessage(e.message, 'error'); }
+        finally { loader.style.display = 'none'; }
+    }
+
+    // 5. EVENT LISTENERS A LOGIKA
+    
+    // Auth a číslo
+    signInAnonymously(auth).then(() => {
+        console.log("Firebase pripojený.");
+        generateNextNumber();
+    }).catch(error => console.error("Auth error:", error));
+
+    // Nastavenie dátumu pri načítaní
+    const today = new Date();
+    document.getElementById('datumInput').value = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
+
+    // Zmena modelov
+    const models = {
+        z80: { ext: "PUZ-SHWM80VAA", int: "ERSF-YM9E" },
+        z100: { ext: "PUZ-SHWM100YAA", int: "ERSF-YM9E" },
+        z120: { ext: "PUZ-SHWM120YAA", int: "ERST-YM9E" },
+        pi80: { ext: "PUZ-SWM80VAA", int: "ERSF-VM2E" }
+    };
+    
+    document.getElementById('modelSelector').addEventListener('change', (e) => {
+        const val = e.target.value;
+        if (models[val]) {
+            document.getElementById('extModel').value = models[val].ext;
+            document.getElementById('intModel').value = models[val].int;
+        }
+    });
+
+    // Priradenie tlačidiel
+    document.getElementById('btnNewProtocol').addEventListener('click', createNewProtocol);
+    document.getElementById('btnSaveToArchive').addEventListener('click', saveToArchive);
+
+    // Fotky
+    function previewImage(event, previewId, placeholderId) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const out = document.getElementById(previewId);
+            document.getElementById(placeholderId).style.display = 'none';
+            out.src = reader.result; 
+            out.style.display = 'block';
+        };
+        if(event.target.files[0]) reader.readAsDataURL(event.target.files[0]);
+    }
+    document.getElementById('filePhoto1').addEventListener('change', (e) => previewImage(e, 'photoPreview1', 'photoPlaceholder1'));
+    document.getElementById('filePhoto2').addEventListener('change', (e) => previewImage(e, 'photoPreview2', 'photoPlaceholder2'));
+
+    // Podpis
+    const canvas = document.getElementById('sigPad');
+    const ctx = canvas.getContext('2d');
+    
+    const ratio = window.devicePixelRatio || 1;
+    canvas.width = canvas.offsetWidth * ratio;
+    canvas.height = canvas.offsetHeight * ratio;
+    ctx.scale(ratio, ratio);
+    
+    let drawing = false;
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#00008B';
+    
+    const getPos = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        return {
+            x: (e.touches ? e.touches[0].clientX : e.clientX) - rect.left,
+            y: (e.touches ? e.touches[0].clientY : e.clientY) - rect.top
+        };
+    };
+
+    canvas.addEventListener('mousedown', (e) => { drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); });
+    canvas.addEventListener('mousemove', (e) => { if(drawing) { e.preventDefault(); const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); }});
+    window.addEventListener('mouseup', () => { drawing = false; });
+    
+    canvas.addEventListener('touchstart', (e) => { drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); });
+    canvas.addEventListener('touchmove', (e) => { if(drawing) { e.preventDefault(); const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); }});
+    canvas.addEventListener('touchend', () => { drawing = false; });
+    
+    function clearSig() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+    document.getElementById('btnClearSig').addEventListener('click', clearSig);
+</script>
+</body>
+</html>
