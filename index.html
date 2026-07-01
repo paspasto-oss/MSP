@@ -66,7 +66,7 @@
     <header>
         <div class="logo-box">
             <img src="Mitsubishi_Electric-Logo.wine.png" alt="Mitsubishi Electric">
-            <img src="logo_spektra.png" alt="SPEKTRA INSTALL">
+            <img src="spektra_install.png" alt="SPEKTRA INSTALL">
         </div>
         <div>
             <h1>PROTOKOL O UVEDENÍ DO PREVÁDZKY</h1>
@@ -230,12 +230,12 @@
     import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
     const firebaseConfig = {
-        apiKey: "VAŠA_API_KEY",
-        authDomain: "VAŠA_DOMENA.firebaseapp.com",
-        projectId: "VAŠ_PROJEKT",
-        storageBucket: "VAŠA_BUCKET.appspot.com",
-        messagingSenderId: "...",
-        appId: "..."
+        apiKey: "AIzaSyB5E5MX1TxqjouS_3KyaCC-mx1jcC-CWpM",
+        authDomain: "misp-7d5ef.firebaseapp.com",
+        projectId: "misp-7d5ef",
+        storageBucket: "misp-7d5ef.firebasestorage.app",
+        messagingSenderId: "967417736804",
+        appId: "1:967417736804:web:bbd6c73c067287bb487971"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -253,7 +253,6 @@
 
     async function generateNextNumber() {
         const today = new Date();
-        // Formát RRRRMM (napr. 202607)
         const datePrefix = today.getFullYear() + String(today.getMonth() + 1).padStart(2, '0');
         
         let nextSequence = 1;
@@ -262,7 +261,6 @@
             const sequences = [];
             querySnapshot.forEach(doc => {
                 const data = doc.data();
-                // Hľadáme protokoly, ktoré začínajú aktuálnym RRRRMM
                 if (data.protoCislo && data.protoCislo.startsWith(datePrefix)) {
                     const parts = data.protoCislo.split('-');
                     if (parts.length > 1) {
@@ -273,7 +271,6 @@
             if (sequences.length > 0) nextSequence = Math.max(...sequences) + 1;
         } catch (e) { console.error("Chyba pri generovaní čísla:", e); }
 
-        // Formát RRRRMM-XXXX (napr. 202607-0001)
         document.getElementById('protoCislo').value = `${datePrefix}-${String(nextSequence).padStart(4, '0')}`;
     }
 
