@@ -11,8 +11,8 @@
         .paper { background: white; width: 210mm; min-height: 297mm; padding: 10mm 15mm; margin: 5px auto; box-shadow: 0 5px 25px rgba(0,0,0,0.1); position: relative; box-sizing: border-box; }
         
         header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--brand-red); padding-bottom: 12px; margin-bottom: 12px; }
-        .logo-box { display: flex; align-items: center; }
-        .logo-box img { height: 120px; } /* Zväčšené logo */
+        .logo-box { display: flex; align-items: center; gap: 20px; }
+        .logo-box img { height: 60px; object-fit: contain; } 
         
         h1 { font-size: 15px; margin: 0; color: var(--brand-red); text-transform: uppercase; text-align: right; }
         h2 { font-size: 11px; background: #e0e0e0; border-left: 4px solid var(--brand-red); color: #333; padding: 5px 10px; margin: 15px 0 6px 0; text-transform: uppercase; font-weight: bold; }
@@ -66,6 +66,7 @@
     <header>
         <div class="logo-box">
             <img src="Mitsubishi_Electric-Logo.wine.png" alt="Mitsubishi Electric">
+            <img src="logo_spektra.png" alt="SPEKTRA INSTALL">
         </div>
         <div>
             <h1>PROTOKOL O UVEDENÍ DO PREVÁDZKY</h1>
@@ -229,12 +230,12 @@
     import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
     const firebaseConfig = {
-        apiKey: "AIzaSyCwcQRH3805_Fif-a451ER-0VxFsZh2l8s",
-        authDomain: "vspspektra.firebaseapp.com",
-        projectId: "vspspektra",
-        storageBucket: "vspspektra.firebasestorage.app",
-        messagingSenderId: "711979749068",
-        appId: "1:711979749068:web:8ce68d29d2059456f43c69"
+        apiKey: "VAŠA_API_KEY",
+        authDomain: "VAŠA_DOMENA.firebaseapp.com",
+        projectId: "VAŠ_PROJEKT",
+        storageBucket: "VAŠA_BUCKET.appspot.com",
+        messagingSenderId: "...",
+        appId: "..."
     };
 
     const app = initializeApp(firebaseConfig);
@@ -252,21 +253,28 @@
 
     async function generateNextNumber() {
         const today = new Date();
-        const datePrefix = today.getFullYear() + String(today.getMonth() + 1).padStart(2, '0') + String(today.getDate()).padStart(2, '0');
+        // Formát RRRRMM (napr. 202607)
+        const datePrefix = today.getFullYear() + String(today.getMonth() + 1).padStart(2, '0');
+        
         let nextSequence = 1;
         try {
             const querySnapshot = await getDocs(collection(db, 'artifacts', appId, 'public', 'data', 'protocols'));
             const sequences = [];
             querySnapshot.forEach(doc => {
                 const data = doc.data();
+                // Hľadáme protokoly, ktoré začínajú aktuálnym RRRRMM
                 if (data.protoCislo && data.protoCislo.startsWith(datePrefix)) {
                     const parts = data.protoCislo.split('-');
-                    if (parts.length > 1) sequences.push(parseInt(parts[1]));
+                    if (parts.length > 1) {
+                        sequences.push(parseInt(parts[1]));
+                    }
                 }
             });
             if (sequences.length > 0) nextSequence = Math.max(...sequences) + 1;
-        } catch (e) { console.error("Chyba pri čísle:", e); }
-        document.getElementById('protoCislo').value = `${datePrefix}-${String(nextSequence).padStart(2, '0')}`;
+        } catch (e) { console.error("Chyba pri generovaní čísla:", e); }
+
+        // Formát RRRRMM-XXXX (napr. 202607-0001)
+        document.getElementById('protoCislo').value = `${datePrefix}-${String(nextSequence).padStart(4, '0')}`;
     }
 
     async function saveToArchive() {
